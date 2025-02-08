@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 60%;
+    max-width: 800px;
+    margin: 50px auto;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+img {
+    border-radius: 50%;
+    margin-bottom: 20px;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+button {
+    padding: 12px 25px;
+    margin: 10px 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.edit-btn {
+    background-color: #007BFF;
+    color: white;
+}
+
+.save-btn {
+    background-color: #28a745;
+    color: white;
+    display: none;
+}
+
+.logout-btn {
+    background-color: #DC3545;
+    color: white;
+}
+
+input, select {
+    width: 80%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #007BFF;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-top: 15px;
+    text-align: left;
+}
+
+input[disabled], select[disabled] {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+#profilePicPreview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+
+    img {
+        width: 120px;
+        height: 120px;
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+
+    input, select {
+        width: 100%;
+    }
+}
