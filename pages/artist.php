@@ -13,8 +13,14 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
 if (isset($_GET['username'])) {
     $artist_username = mysqli_real_escape_string($conn, $_GET['username']);
 
-    // Fetch artist details using the username from the query string
-    $artist_query = "SELECT * FROM user WHERE username = '$artist_username' AND user_type = 'artist'";
+    // Fetch artist details from both the 'user' and 'artist' tables
+    $artist_query = "
+    SELECT user.*, artist.description, artist.charge 
+    FROM user 
+    LEFT JOIN artist ON user.user_id = artist.user_id
+    WHERE user.username = '$artist_username' AND user.user_type = 'artist'
+    ";
+
     $artist_result = mysqli_query($conn, $artist_query);
 
     if (!$artist_result) {
@@ -54,6 +60,10 @@ if (isset($_GET['username'])) {
             <p><strong>Email:</strong> <?php echo $artist['user_email']; ?></p>
             <p><strong>Phone:</strong> <?php echo $artist['user_phoneno']; ?></p>
             <p><strong>Birth Date:</strong> <?php echo $artist['user_dob']; ?></p>
+
+            <!-- Display Artist Description and Charge -->
+            <p><strong>Description:</strong> <?php echo !empty($artist['description']) ? $artist['description'] : 'Not defined'; ?></p>
+            <p><strong>Charge:</strong> <?php echo !empty($artist['charge']) ? '₹' . number_format($artist['charge'], 2) : 'Not defined'; ?></p>
 
             <!-- Action Buttons -->
             <div class="action-buttons">

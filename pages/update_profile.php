@@ -11,6 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id']; // Get the user ID from session
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Collect the submitted form data
     $username = $_POST['username'];
@@ -22,40 +23,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_dob = $_POST['user_dob'];
     $user_type = $_POST['user_type'];
 
-    
     // Profile picture upload logic (optional)
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == 0 && $_FILES['profile_pic']['size']!==0) {
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == 0 && $_FILES['profile_pic']['size'] !== 0) {
         // Validate and upload the new profile picture
-
-        print_r($_FILES);
         $upload_dir = 'uploads/';
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true); // Create the folder if not exists
         }
 
-        $profile_pic=$_FILES['profile_pic']['name'];
+        $profile_pic = $_FILES['profile_pic']['name'];
         $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
 
         if (in_array($_FILES['profile_pic']['type'], $allowed_types)) {
             $file_name = time() . '-' . basename($profile_pic);
-            $profile_pic =$file_name;
+            $profile_pic = $file_name;
             $file_path = $upload_dir . $file_name;
             move_uploaded_file($_FILES['profile_pic']['tmp_name'], $file_path);
-            $old_file_path= $upload_dir.$_POST['existing_profile_pic'];
+
+            // Delete the old profile picture if it exists
+            $old_file_path = $upload_dir . $_POST['existing_profile_pic'];
             if (file_exists($old_file_path)) {
-                if (unlink($old_file_path)) {
-                    echo "File deleted successfully!";
-                } else {
-                    echo "Error deleting file.";
-                }
-            } 
-            else{
-                echo "not delte";
+                unlink($old_file_path);
             }
         } else {
             echo "Invalid file type. Only JPG, PNG, and GIF files are allowed.";
-            $profile_pic=$_POST['existing_profile_pic'];
-           
+            $profile_pic = $_POST['existing_profile_pic'];
         }
     } else {
         // If no file is uploaded, retain the existing profile picture
@@ -72,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 user_phoneno = ?, 
                 user_dob = ?, 
                 user_type = ?, 
-                profile_pic = ?
+                profile_pic = ? 
               WHERE user_id = ?";
 
     // Prepare and bind parameters to the query
@@ -81,6 +73,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Execute the query and check for errors
     if ($stmt->execute()) {
+        // If the user is an artist, update the artist table as well
+        if ($user_type == 'artist') {
+            $description = $_POST['description'];
+            $charge = $_POST['charge'];
+
+            // Check if the artist already has a record in the artist table
+            $check_artist_query = "SELECT * FROM artist WHERE user_id = ?";
+            $check_stmt = $conn->prepare($check_artist_query);
+            $check_stmt->bind_param("i", $user_id);
+            $check_stmt->execute();
+            $check_result = $check_stmt->get_result();
+
+            if ($check_result->num_rows > 0) {
+                // Artist record exists, update it
+                $update_artist_query = "UPDATE artist SET description = ?, charge = ? WHERE user_id = ?";
+                $update_artist_stmt = $conn->prepare($update_artist_query);
+                $update_artist_stmt->bind_param("ssi", $description, $charge, $user_id);
+                $update_artist_stmt->execute();
+            } else {
+                // Artist record does not exist, insert new record
+                $insert_artist_query = "INSERT INTO artist (user_id, description, charge) VALUES (?, ?, ?)";
+                $insert_artist_stmt = $conn->prepare($insert_artist_query);
+                $insert_artist_stmt->bind_param("iss", $user_id, $description, $charge);
+                $insert_artist_stmt->execute();
+            }
+        }
+
         echo "Profile updated successfully!";
         header("Location: profile.php"); // Redirect to the profile page
         exit();

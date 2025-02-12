@@ -48,7 +48,15 @@ function createTables($conn) {
         profile_pic VARCHAR(255) NULL  -- New column for profile picture
     )";
 
-   
+    // SQL to create the 'artist' table with artist_id, user_id, description, and charge
+    $artistTable = "
+    CREATE TABLE IF NOT EXISTS artist (
+        artist_id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        description TEXT,
+        charge DECIMAL(10, 2),
+        FOREIGN KEY (user_id) REFERENCES user(user_id)
+    )";
 
     // SQL to create the 'booking' table
     $bookingTable = "
@@ -69,7 +77,11 @@ function createTables($conn) {
         show_error("Error creating table 'user': " . $conn->error);
     }
 
-   
+    if ($conn->query($artistTable) === TRUE) {
+        print_message("Table 'artist' created successfully.");
+    } else {
+        show_error("Error creating table 'artist': " . $conn->error);
+    }
 
     if ($conn->query($bookingTable) === TRUE) {
         print_message("Table 'booking' created successfully.");

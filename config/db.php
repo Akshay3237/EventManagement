@@ -18,15 +18,9 @@ if ($conn->connect_error) {
     print_message("Connection successful.");
 }
 
-// Create database if it doesn't exist
-// include('dbcreation.php');
-// createDatabase($conn, $dbname);
 
 // Select the database after creating it
 $conn->select_db($dbname);
-
-// Create tables (if they don't exist)
-// createTables($conn);
 
 // Optional: Set character set to UTF-8
 $conn->set_charset("utf8");
